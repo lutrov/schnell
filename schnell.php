@@ -3,9 +3,9 @@
 /*
 Plugin Name: Schnell
 Description: Improves the speed of your site by enabling client side caching with "expire" headers, "cache-control" headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
-Version: 1.8
 Author: Ivan Lutrov
 Author URI: http://lutrov.com/
+Version: 2.0
 */
 
 defined('ABSPATH') || die('Ahem.');
