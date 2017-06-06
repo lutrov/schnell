@@ -5,10 +5,15 @@ Plugin Name: Schnell
 Description: Improves the speed of your site by enabling client side caching with "expire" headers, "cache-control" headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
 Author: Ivan Lutrov
 Author URI: http://lutrov.com/
-Version: 2.0
+Version: 3.0
 */
 
 defined('ABSPATH') || die('Ahem.');
+
+//
+// Define constants used by this plugin.
+//
+define('SCHNELL_CACHE_LIFETIME', '691200'); // 8 days
 
 //
 // Write .htaccess file.
@@ -65,22 +70,22 @@ function schnell_htaccess_rules() {
 	$result .= '<ifModule mod_expires.c>' . PHP_EOL;
 	$result .= 'ExpiresActive On' . PHP_EOL;
 	$result .= 'ExpiresDefault A60' . PHP_EOL;
-	$result .= '# Font files expire in 1 year' . PHP_EOL;
-	$result .= 'ExpiresByType font/otf A' . YEAR_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType font/x-woff A' . YEAR_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType application/font-woff2 A' . YEAR_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType font/ttf A' . YEAR_IN_SECONDS . PHP_EOL;
-	$result .= '# Image files expire in 1 month' . PHP_EOL;
-	$result .= 'ExpiresByType image/x-icon A' . MONTH_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType image/jpeg A' . MONTH_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType image/png A' . MONTH_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType image/gif A' . MONTH_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType application/x-shockwave-flash A' . MONTH_IN_SECONDS . PHP_EOL;
-	$result .= '# Stylesheet & Javascript files expire in 1 week' . PHP_EOL;
-	$result .= 'ExpiresByType text/css A' . WEEK_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType text/javascript A' . WEEK_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType application/javascript A' . WEEK_IN_SECONDS . PHP_EOL;
-	$result .= 'ExpiresByType application/x-javascript A' . WEEK_IN_SECONDS . PHP_EOL;
+	$result .= '# Set expiry for font files' . PHP_EOL;
+	$result .= 'ExpiresByType font/otf A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType font/x-woff A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType application/font-woff2 A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType font/ttf A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= '# Set expiry for image files' . PHP_EOL;
+	$result .= 'ExpiresByType image/x-icon A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType image/jpeg A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType image/png A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType image/gif A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType application/x-shockwave-flash A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= '# Set expiry for CSS & JS files' . PHP_EOL;
+	$result .= 'ExpiresByType text/css A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType text/javascript A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType application/javascript A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
+	$result .= 'ExpiresByType application/x-javascript A' . SCHNELL_CACHE_LIFETIME . PHP_EOL;
 	$result .= '# HTML files do not expire' . PHP_EOL;
 	$result .= 'ExpiresByType text/html A0' . PHP_EOL;
 	$result .= 'ExpiresByType application/xhtml+xml A0'. PHP_EOL;
@@ -88,16 +93,16 @@ function schnell_htaccess_rules() {
 	$result .= '# Set cache-control headers' . PHP_EOL;
 	$result .= '<ifModule mod_headers.c>' . PHP_EOL;
 	$result .= '<filesMatch "\.(otf|woff2?|ttf)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "public, max-age=' . YEAR_IN_SECONDS . '"' . PHP_EOL;
+	$result .= 'Header set Cache-Control "public, max-age=' . SCHNELL_CACHE_LIFETIME . '"' . PHP_EOL;
 	$result .= '</filesMatch>' . PHP_EOL;
 	$result .= '<filesMatch "\.(ico|jpe?g|png|gif|swf)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "public, max-age=' . MONTH_IN_SECONDS . '"' . PHP_EOL;
+	$result .= 'Header set Cache-Control "public, max-age=' . SCHNELL_CACHE_LIFETIME . '"' . PHP_EOL;
 	$result .= '</filesMatch>' . PHP_EOL;
 	$result .= '<filesMatch "\.(css)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "public, max-age=' . WEEK_IN_SECONDS . '"' . PHP_EOL;
+	$result .= 'Header set Cache-Control "public, max-age=' . SCHNELL_CACHE_LIFETIME . '"' . PHP_EOL;
 	$result .= '</filesMatch>' . PHP_EOL;
 	$result .= '<filesMatch "\.(js)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "private, max-age=' . WEEK_IN_SECONDS . '"' . PHP_EOL;
+	$result .= 'Header set Cache-Control "private, max-age=' . SCHNELL_CACHE_LIFETIME . '"' . PHP_EOL;
 	$result .= '</filesMatch>' . PHP_EOL;
 	$result .= '<filesMatch "\.(x?html?|php)$">' . PHP_EOL;
 	$result .= 'Header set Cache-Control "private, must-revalidate, max-age=0"' . PHP_EOL;
