@@ -3,9 +3,10 @@
 /*
 Plugin Name: Schnell
 Description: Improves the speed of your site by enabling client side caching with "expire" headers, "cache-control" headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
+Plugin URI: https://github.com/lutrov/schnell
 Author: Ivan Lutrov
 Author URI: http://lutrov.com/
-Version: 3.0
+Version: 3.2
 */
 
 defined('ABSPATH') || die('Ahem.');
@@ -114,9 +115,10 @@ function schnell_htaccess_rules() {
 	$result .= 'Header unset X-Frame-Options' . PHP_EOL;
 	$result .= 'Header unset X-Pingback' . PHP_EOL;
 	$result .= 'Header unset X-Powered-By' . PHP_EOL;
+	$result .= '# Unset ETags' . PHP_EOL;
+	$result .= 'Header unset ETag' . PHP_EOL;
 	$result .= '</ifModule>' . PHP_EOL;
 	$result .= '# Turn off ETags' . PHP_EOL;
-	$result .= 'Header unset ETag' . PHP_EOL;
 	$result .= 'FileETag None' . PHP_EOL;
 	$result .= '# END Schnell Optimisation' . PHP_EOL;
 	return $result;
