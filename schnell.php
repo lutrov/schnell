@@ -6,15 +6,10 @@ Description: Improves the speed of your site by enabling client side caching wit
 Plugin URI: https://github.com/lutrov/schnell
 Author: Ivan Lutrov
 Author URI: http://lutrov.com/
-Version: 3.4
+Version: 4.0
 */
 
 defined('ABSPATH') || die('Ahem.');
-
-//
-// Define constants used by this plugin.
-//
-define('SCHNELL_CACHE_LIFETIME', '691200'); // 8 days
 
 //
 // Write .htaccess file.
@@ -55,47 +50,110 @@ function schnell_htaccess_file($action) {
 //
 function schnell_htaccess_rules() {
 	$result  = '# BEGIN Schnell Optimisation' . PHP_EOL;
-	$result .= '# Compress text files' . PHP_EOL;
-	$result .= '<ifModule mod_deflate.c>' . PHP_EOL;
-	$result .= 'AddOutputFilterByType DEFLATE text/html text/xml text/css text/plain' . PHP_EOL;
-	$result .= 'AddOutputFilterByType DEFLATE image/svg+xml application/xhtml+xml application/xml' . PHP_EOL;
-	$result .= 'AddOutputFilterByType DEFLATE application/rdf+xml application/rss+xml application/atom+xml' . PHP_EOL;
-	$result .= 'AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript application/json' . PHP_EOL;
-	$result .= '</ifModule>' . PHP_EOL;
-	$result .= '# Compress fonts' . PHP_EOL;
-	$result .= '<ifModule mod_deflate.c>' . PHP_EOL;
-	$result .= 'AddOutputFilterByType DEFLATE application/x-font-ttf application/x-font-otf' . PHP_EOL;
-	$result .= 'AddOutputFilterByType DEFLATE font/truetype font/opentype' . PHP_EOL;
-	$result .= '</ifModule>' . PHP_EOL;
+	$result .= '# Response headers' . PHP_EOL;
 	$result .= '<IfModule mod_headers.c>' . PHP_EOL;
-	$result .= '# Set cache control headers' . PHP_EOL;
-	$result .= 'Header set Vary "Accept-Encoding"' . PHP_EOL;
-	$result .= '# Images expire after 1 month' . PHP_EOL;
-	$result .= '<FilesMatch "\.(jpg|jpeg|png|gif|ico)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "max-age=' . SCHNELL_CACHE_LIFETIME . ', public"' . PHP_EOL;
-	$result .= '</FilesMatch>' . PHP_EOL;
-	$result .= '# Scripts expire after 1 month' . PHP_EOL;
-	$result .= '<FilesMatch "\.(css|js)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "max-age=' . SCHNELL_CACHE_LIFETIME . ', public"' . PHP_EOL;
-	$result .= '</FilesMatch>' . PHP_EOL;
-	$result .= '# Fonts expire after 1 month' . PHP_EOL;
-	$result .= '<FilesMatch "\.(woff|woff2|ttf|otf)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "max-age=' . SCHNELL_CACHE_LIFETIME . ', public"' . PHP_EOL;
-	$result .= '</FilesMatch>' . PHP_EOL;
-	$result .= '# Archives expire after 1 month' . PHP_EOL;
-	$result .= '<FilesMatch "\.(zip|7z|tar)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "max-age=' . SCHNELL_CACHE_LIFETIME . ', public"' . PHP_EOL;
-	$result .= '</FilesMatch>' . PHP_EOL;
-	$result .= '# Documents expire after 1 month' . PHP_EOL;
-	$result .= '<FilesMatch "\.(pdf|docx|xlsx|doc|xls|otd|ods)$">' . PHP_EOL;
-	$result .= 'Header set Cache-Control "max-age=' . SCHNELL_CACHE_LIFETIME . ', public"' . PHP_EOL;
-	$result .= '</FilesMatch>' . PHP_EOL;
-	$result .= '# Set other useful headers' . PHP_EOL;
-	$result .= 'Header set X-Content-Type-Options "nosniff"' . PHP_EOL;
-	$result .= '# Unset useless headers' . PHP_EOL;
-	$result .= 'Header unset X-Frame-Options' . PHP_EOL;
-	$result .= 'Header unset X-Pingback' . PHP_EOL;
-	$result .= 'Header unset X-Powered-By' . PHP_EOL;
+	$result .= "\t" . 'Header set Cache-Control "public"' . PHP_EOL;
+	$result .= "\t" . 'Header set Vary "Accept-Encoding"' . PHP_EOL;
+	$result .= "\t" . 'Header set X-Content-Type-Options "nosniff"' . PHP_EOL;
+	$result .= "\t" . 'Header unset X-Frame-Options' . PHP_EOL;
+	$result .= "\t" . 'Header unset X-Pingback' . PHP_EOL;
+	$result .= "\t" . 'Header unset X-Powered-By' . PHP_EOL;
+	$result .= "\t" . 'Header unset ETag' . PHP_EOL;
+	$result .= '</IfModule>' . PHP_EOL;
+	$result .= '# Leverage browser caching' . PHP_EOL;
+	$result .= '<IfModule mod_expires.c>' . PHP_EOL;
+	$result .= "\t" . 'ExpiresActive On' . PHP_EOL;
+	$result .= "\t" . 'ExpiresDefault A' . HOUR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Data files are not cached' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/json A0' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/xml A0' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/html A0' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/plain A0' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/xml A0' . PHP_EOL;
+	$result .= "\t" . '# Feeds are cached for 1 hour' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/atom+xml A' . HOUR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/rss+xml A' . HOUR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/x-component A' . HOUR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Scripts are cached for 1 month' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/javascript A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/x-javascript A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/css A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/javascript A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Images are cached for 1 year' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/bmp A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/gif A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/jp2 A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/jpe A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/jpeg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/jpg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/pipeg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/png A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/svg+xml A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/tiff A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/vnd.microsoft.icon A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Icons are cached for 1 year' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/ico A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/ico A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/icon A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/x-ico A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/x-icon A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType text/ico A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Audio files are cached for 1 year' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/basic A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/mid A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/midi A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/mpeg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/ogg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/x-aiff A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/x-mpegurl A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/x-pn-realaudio A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType audio/x-wav A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Video files are cached for 1 year' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/mp4 A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/mpeg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/ogg A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/quicktime A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/webm A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/x-la-asf A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/x-ms-asf A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType video/x-msvideo A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType x-world/x-vrml A' . YEAR_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Fonts are cached for 1 month' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/font-woff A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/vnd.ms-fontobject A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/x-font-ttf A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/x-font-woff A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType font/opentype A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType font/truetype A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . '# Other files are cached for 1 month' . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/pdf A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/smil A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType application/vnd.wap.wbxml A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= "\t" . 'ExpiresByType image/vnd.wap.wbmp A' . MONTH_IN_SECONDS . PHP_EOL;
+	$result .= '</IfModule>' . PHP_EOL;
+	$result .= '# Enable compression' . PHP_EOL;
+	$result .= '<IfModule mod_deflate.c>' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/javascript' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/rss+xml' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/vnd.ms-fontobject' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/x-font' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/x-font-opentype' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/x-font-otf' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/x-font-truetype' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/x-font-ttf' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/x-javascript' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/xhtml+xml' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE application/xml' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE font/opentype' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE font/otf' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE font/ttf' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE image/svg+xml' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE image/x-icon' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE text/css' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE text/html' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE text/javascript' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE text/plain' . PHP_EOL;
+	$result .= "\t" . 'AddOutputFilterByType DEFLATE text/xml' . PHP_EOL;
 	$result .= '</IfModule>' . PHP_EOL;
 	$result .= '# END Schnell Optimisation' . PHP_EOL;
 	return $result;
