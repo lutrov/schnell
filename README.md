@@ -1,6 +1,6 @@
 # Schnell
 
-Improves the speed of your site by enabling client side caching with `Expire` headers, `Cache-Control` headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
+Improves the speed of your site by enabling client side caching with `Expires` headers, `Cache-Control` headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
 
 ## Copyright and License
 
