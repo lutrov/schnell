@@ -8,7 +8,7 @@ This project is licensed under the [GNU GPL](http://www.gnu.org/licenses/old-lic
 
 ## Documentation
 
-Schnell requires no configation. These are the its cache settings:
+Schnell requires no configation. These are its cache settings:
 
 * Stylesheet files (CSS) are cached for 1 week
 * Script files (JS) are cached for 1 month
