@@ -2,12 +2,12 @@
 
 /*
 Plugin Name: Schnell
-Plugin URI: https://github.com/lutrov/schnell
-Description: Improves the speed of your site by enabling client side caching with `Expire` headers, `Cache-Control` headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
 Version: 5.0
+Description: Improves the speed of your site by enabling client side caching with `Expires` headers, `Cache-Control` headers &amp; output compression. Why this plugin name? Schnell means "quick" in German.
+Plugin URI: https://github.com/lutrov/schnell
+Copyright: 2018, Ivan Lutrov
 Author: Ivan Lutrov
 Author URI: http://lutrov.com/
-Copyright: 2018, Ivan Lutrov
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -41,9 +41,9 @@ function schnell_htaccess_file($action) {
 			switch ($action) {
 				case 'install':
 					if ($count > 0) {
-						$content = trim(str_replace($hash, $rules, $content));
+						$content = str_replace($hash, $rules, $content);
 					} else {
-						$content = sprintf('%s%s%s%s', $rules, PHP_EOL, PHP_EOL, trim($content));
+						$content = sprintf('%s%s%s', $rules, PHP_EOL, trim($content));
 					}
 					break;
 				case 'uninstall':
